@@ -1,14 +1,17 @@
 """
-TAD Database Persistence Layer (Milestone 4)
+TAD Database Persistence Layer (Milestone 4-6)
 
 Provides SQLite-based persistent storage for:
-- Channel metadata and subscriptions
+- Channel metadata and subscriptions (with type and ownership)
+- Channel membership and role management (Milestone 6)
 - Message history with full content
 - Message signatures and sender information
+- Encrypted content storage for private channels (Milestone 6)
 - Query interfaces for history retrieval
 
 Architecture:
-- Channels table: Registry of channels
+- Channels table: Registry of channels (public/private, owner)
+- Channel_members table: Membership and role management
 - Messages table: Complete message history with signatures
 - Parameterized queries: Prevention of SQL injection
 - Duplicate prevention: INSERT OR IGNORE on msg_id
@@ -76,7 +79,8 @@ class DatabaseManager:
         Create database schema if it doesn't exist.
 
         Tables:
-        - channels: Channel metadata and subscription info
+        - channels: Channel metadata and subscription info (with type and ownership - M6)
+        - channel_members: Membership and role management (Milestone 6)
         - messages: Complete message history with signatures
         """
         if not self.connection:
@@ -85,13 +89,27 @@ class DatabaseManager:
         try:
             cursor = self.connection.cursor()
 
-            # Channels table
+            # Channels table - Updated for Milestone 6
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS channels (
                     channel_id TEXT PRIMARY KEY,
                     name TEXT NOT NULL,
+                    type TEXT DEFAULT 'public',
+                    owner_node_id TEXT,
                     created_at TEXT NOT NULL,
                     subscribed BOOLEAN DEFAULT 1
+                )
+            """)
+
+            # Channel members table - New in Milestone 6
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS channel_members (
+                    channel_id TEXT NOT NULL,
+                    node_id TEXT NOT NULL,
+                    role TEXT DEFAULT 'member',
+                    joined_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                    PRIMARY KEY (channel_id, node_id),
+                    FOREIGN KEY(channel_id) REFERENCES channels(channel_id)
                 )
             """)
 
@@ -104,6 +122,7 @@ class DatabaseManager:
                     timestamp TEXT NOT NULL,
                     content TEXT NOT NULL,
                     signature TEXT NOT NULL,
+                    is_encrypted BOOLEAN DEFAULT 0,
                     created_at TEXT DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY(channel_id) REFERENCES channels(channel_id)
                 )
@@ -120,20 +139,75 @@ class DatabaseManager:
                 ON messages(msg_id)
             """)
 
+            cursor.execute("""
+                CREATE INDEX IF NOT EXISTS idx_channel_members_node
+                ON channel_members(node_id)
+            """)
+
             self.connection.commit()
             logger.debug("Database tables created/verified")
+
+            # Run migration for existing databases
+            self._migrate_schema()
 
         except sqlite3.Error as e:
             logger.error(f"Error creating tables: {e}")
             raise
 
-    def store_channel(self, channel_id: str, name: str = None) -> None:
+    def _migrate_schema(self) -> None:
+        """
+        Migrate existing database schema to Milestone 6 format.
+
+        Adds missing columns to channels table if they don't exist.
+        """
+        if not self.connection:
+            return
+
+        try:
+            cursor = self.connection.cursor()
+
+            # Check if new columns exist
+            cursor.execute("PRAGMA table_info(channels)")
+            columns = {row[1] for row in cursor.fetchall()}
+
+            # Add type column if missing
+            if "type" not in columns:
+                cursor.execute("ALTER TABLE channels ADD COLUMN type TEXT DEFAULT 'public'")
+                logger.info("Added 'type' column to channels table")
+
+            # Add owner_node_id column if missing
+            if "owner_node_id" not in columns:
+                cursor.execute("ALTER TABLE channels ADD COLUMN owner_node_id TEXT")
+                logger.info("Added 'owner_node_id' column to channels table")
+
+            # Check if is_encrypted exists in messages
+            cursor.execute("PRAGMA table_info(messages)")
+            msg_columns = {row[1] for row in cursor.fetchall()}
+            if "is_encrypted" not in msg_columns:
+                cursor.execute("ALTER TABLE messages ADD COLUMN is_encrypted BOOLEAN DEFAULT 0")
+                logger.info("Added 'is_encrypted' column to messages table")
+
+            self.connection.commit()
+            logger.debug("Database schema migration completed")
+
+        except sqlite3.Error as e:
+            logger.warning(f"Schema migration issue (may be normal): {e}")
+
+    def store_channel(
+        self,
+        channel_id: str,
+        name: str = None,
+        channel_type: str = "public",
+        owner_node_id: str = None,
+    ) -> None:
         """
         Store or update a channel in the database.
 
         Args:
             channel_id: Channel identifier (e.g., "#general")
             name: Optional friendly name for the channel
+            channel_type: Type of channel - 'public' or 'private' (default: 'public')
+            owner_node_id: Node ID of the channel owner (for private channels)
         """
         if not self.connection:
             return
@@ -145,14 +219,14 @@ class DatabaseManager:
             # INSERT OR REPLACE to handle updates
             cursor.execute(
                 """
-                INSERT OR REPLACE INTO channels (channel_id, name, created_at, subscribed)
-                VALUES (?, ?, CURRENT_TIMESTAMP, 1)
+                INSERT OR REPLACE INTO channels (channel_id, name, type, owner_node_id, created_at, subscribed)
+                VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, 1)
                 """,
-                (channel_id, name),
+                (channel_id, name, channel_type, owner_node_id),
             )
 
             self.connection.commit()
-            logger.debug(f"Channel stored: {channel_id}")
+            logger.debug(f"Channel stored: {channel_id} (type={channel_type}, owner={owner_node_id})")
 
         except sqlite3.Error as e:
             logger.error(f"Error storing channel {channel_id}: {e}")
@@ -162,14 +236,16 @@ class DatabaseManager:
         Retrieve all channels from the database.
 
         Returns:
-            List of dictionaries with channel_id and name
+            List of dictionaries with channel_id, name, type, and owner
         """
         if not self.connection:
             return []
 
         try:
             cursor = self.connection.cursor()
-            cursor.execute("SELECT channel_id, name FROM channels ORDER BY created_at")
+            cursor.execute(
+                "SELECT channel_id, name, type, owner_node_id FROM channels ORDER BY created_at"
+            )
             rows = cursor.fetchall()
 
             # Convert sqlite3.Row objects to dictionaries
@@ -177,6 +253,191 @@ class DatabaseManager:
 
         except sqlite3.Error as e:
             logger.error(f"Error retrieving channels: {e}")
+            return []
+
+    def get_channel_info(self, channel_id: str) -> Optional[Dict]:
+        """
+        Get detailed information about a channel.
+
+        Args:
+            channel_id: Channel identifier
+
+        Returns:
+            Dictionary with channel_id, name, type, owner_node_id, or None if not found
+        """
+        if not self.connection:
+            return None
+
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+                "SELECT channel_id, name, type, owner_node_id FROM channels WHERE channel_id = ?",
+                (channel_id,),
+            )
+            row = cursor.fetchone()
+
+            return dict(row) if row else None
+
+        except sqlite3.Error as e:
+            logger.error(f"Error retrieving channel info for {channel_id}: {e}")
+            return None
+
+    def add_channel_member(
+        self, channel_id: str, node_id: str, role: str = "member"
+    ) -> bool:
+        """
+        Add a member to a channel.
+
+        Args:
+            channel_id: Channel identifier
+            node_id: Node ID of the member
+            role: Role of the member ('member', 'moderator', or 'owner')
+
+        Returns:
+            True if successful, False otherwise
+        """
+        if not self.connection:
+            return False
+
+        try:
+            cursor = self.connection.cursor()
+
+            # INSERT OR REPLACE to handle updates
+            cursor.execute(
+                """
+                INSERT OR REPLACE INTO channel_members (channel_id, node_id, role)
+                VALUES (?, ?, ?)
+                """,
+                (channel_id, node_id, role),
+            )
+
+            self.connection.commit()
+            logger.debug(f"Added {node_id} to {channel_id} with role '{role}'")
+            return True
+
+        except sqlite3.Error as e:
+            logger.error(f"Error adding member to channel: {e}")
+            return False
+
+    def remove_channel_member(self, channel_id: str, node_id: str) -> bool:
+        """
+        Remove a member from a channel.
+
+        Args:
+            channel_id: Channel identifier
+            node_id: Node ID of the member to remove
+
+        Returns:
+            True if successful, False otherwise
+        """
+        if not self.connection:
+            return False
+
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+                "DELETE FROM channel_members WHERE channel_id = ? AND node_id = ?",
+                (channel_id, node_id),
+            )
+
+            self.connection.commit()
+            logger.debug(f"Removed {node_id} from {channel_id}")
+            return True
+
+        except sqlite3.Error as e:
+            logger.error(f"Error removing member from channel: {e}")
+            return False
+
+    def is_channel_member(self, channel_id: str, node_id: str) -> bool:
+        """
+        Check if a node is a member of a channel.
+
+        Args:
+            channel_id: Channel identifier
+            node_id: Node ID to check
+
+        Returns:
+            True if node is a member, False otherwise
+        """
+        if not self.connection:
+            return False
+
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+                "SELECT 1 FROM channel_members WHERE channel_id = ? AND node_id = ?",
+                (channel_id, node_id),
+            )
+
+            return cursor.fetchone() is not None
+
+        except sqlite3.Error as e:
+            logger.error(f"Error checking channel membership: {e}")
+            return False
+
+    def get_channel_members(self, channel_id: str) -> List[Dict]:
+        """
+        Get all members of a channel.
+
+        Args:
+            channel_id: Channel identifier
+
+        Returns:
+            List of dictionaries with node_id and role
+        """
+        if not self.connection:
+            return []
+
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+                """
+                SELECT node_id, role, joined_at
+                FROM channel_members
+                WHERE channel_id = ?
+                ORDER BY joined_at
+                """,
+                (channel_id,),
+            )
+
+            rows = cursor.fetchall()
+            return [dict(row) for row in rows]
+
+        except sqlite3.Error as e:
+            logger.error(f"Error retrieving channel members: {e}")
+            return []
+
+    def get_member_channels(self, node_id: str) -> List[Dict]:
+        """
+        Get all channels a node is a member of.
+
+        Args:
+            node_id: Node ID
+
+        Returns:
+            List of dictionaries with channel_id, channel name, and role
+        """
+        if not self.connection:
+            return []
+
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+                """
+                SELECT c.channel_id, c.name, c.type, m.role, m.joined_at
+                FROM channel_members m
+                JOIN channels c ON m.channel_id = c.channel_id
+                WHERE m.node_id = ?
+                ORDER BY m.joined_at
+                """,
+                (node_id,),
+            )
+
+            rows = cursor.fetchall()
+            return [dict(row) for row in rows]
+
+        except sqlite3.Error as e:
+            logger.error(f"Error retrieving member channels: {e}")
             return []
 
     def store_message(self, message: Dict) -> bool:
