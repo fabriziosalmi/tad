@@ -1,0 +1,12 @@
+*.json
+*.key
+__pycache__/
+*.pyc
+.pytest_cache/
+.claude/
+.env
+.vscode/
+.DS_Store
+tad_node.db
+tad/__pycache__/
+tests/__pycache__/

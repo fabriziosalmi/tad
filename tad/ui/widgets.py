@@ -34,6 +34,7 @@ class ChannelItem(ListItem):
     def __init__(
         self,
         channel_id: str,
+        channel_type: str = "public",
         unread_count: int = 0,
         is_active: bool = False,
         **kwargs,
@@ -43,28 +44,30 @@ class ChannelItem(ListItem):
 
         Args:
             channel_id: Channel identifier (e.g., "#general")
+            channel_type: Type of the channel ('public' or 'private')
             unread_count: Number of unread messages
             is_active: Whether this is the currently selected channel
         """
         self.channel_id = channel_id
+        self.channel_type = channel_type
         self.unread_count = unread_count
         self.is_active = is_active
 
-        # Format the display label with optional badge
-        label_text = channel_id
-        if unread_count > 0:
-            label_text = f"{channel_id} ({unread_count})"
+        # Format the display label with optional badge and lock icon
+        label_text = self._format_label()
 
         super().__init__(Label(label_text), **kwargs)
+
+    def _format_label(self) -> str:
+        """Format the display label with icon and unread count."""
+        prefix = "🔒 " if self.channel_type == "private" else ""
+        suffix = f" ({self.unread_count})" if self.unread_count > 0 else ""
+        return f"{prefix}{self.channel_id}{suffix}"
 
     def update_unread(self, count: int) -> None:
         """Update the unread message count."""
         self.unread_count = count
-
-        # Update display
-        label_text = self.channel_id
-        if count > 0:
-            label_text = f"{self.channel_id} ({count})"
+        label_text = self._format_label()
 
         # Update the label widget
         if self.children:
@@ -112,10 +115,14 @@ class ChannelList(Static):
         """Compose the widget."""
         yield ListView(id="channel_list")
 
-    def add_channel(self, channel_id: str) -> None:
+    def add_channel(self, channel_id: str, channel_type: str = "public") -> None:
         """Add a channel to the list."""
         if channel_id not in self.channel_items:
-            item = ChannelItem(channel_id, is_active=(channel_id == self.active_channel))
+            item = ChannelItem(
+                channel_id,
+                channel_type=channel_type,
+                is_active=(channel_id == self.active_channel),
+            )
             self.channel_items[channel_id] = item
 
             list_view = self.query_one("#channel_list", ListView)

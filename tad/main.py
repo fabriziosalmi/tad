@@ -139,8 +139,12 @@ class TADTUIApp(Screen):
 
         # Initialize channels from node
         logger.info("Initializing TUI...")
-        for channel in self.ui_state.subscribed_channels:
-            self.channel_list.add_channel(channel)
+        all_channels = self.node.db_manager.get_all_channels()
+        for channel_info in all_channels:
+            self.ui_state.add_channel(channel_info["channel_id"])
+            self.channel_list.add_channel(
+                channel_info["channel_id"], channel_info["type"]
+            )
 
         # Set active channel
         self.channel_list.set_active_channel(self.ui_state.active_channel)
@@ -226,8 +230,62 @@ class TADTUIApp(Screen):
             self._cmd_peers(args)
         elif command == "help":
             self._cmd_help(args)
+        elif command == "create":
+            self._cmd_create(args)
+        elif command == "invite":
+            self._cmd_invite(args)
         else:
             self.message_view.add_command_output(f"Unknown command: /{command}")
+
+    def _cmd_create(self, args: list) -> None:
+        """Handle /create command."""
+        if not args:
+            self.message_view.add_command_output(
+                "Usage: /create <#channel_name> [public|private]"
+            )
+            return
+
+        channel_id = args[0]
+        if not channel_id.startswith("#"):
+            channel_id = f"#{channel_id}"
+
+        channel_type = "public"
+        if len(args) > 1 and args[1].lower() == "private":
+            channel_type = "private"
+
+        if self.node.create_channel(channel_id, channel_type):
+            self.ui_state.add_channel(channel_id)
+            self.channel_list.add_channel(channel_id, channel_type)
+            self.message_view.add_system_message(
+                f"Successfully created {channel_type} channel: {channel_id}"
+            )
+            self._cmd_switch([channel_id])
+        else:
+            self.message_view.add_command_output(
+                f"Failed to create channel {channel_id}. It may already exist."
+            )
+
+    def _cmd_invite(self, args: list) -> None:
+        """Handle /invite command."""
+        if len(args) < 2:
+            self.message_view.add_command_output(
+                "Usage: /invite <node_id> <#channel_name>"
+            )
+            return
+
+        target_node_id = args[0]
+        channel_id = args[1]
+        if not channel_id.startswith("#"):
+            channel_id = f"#{channel_id}"
+
+        # Call the node method asynchronously
+        self.app.call_later(
+            self.node.invite_peer_to_channel, channel_id, target_node_id
+        )
+
+        self.message_view.add_system_message(
+            f"Sent invite for {channel_id} to {target_node_id[:8]}..."
+        )
 
     def _cmd_join(self, args: list) -> None:
         """Handle /join command."""
@@ -244,7 +302,9 @@ class TADTUIApp(Screen):
         self.ui_state.add_channel(channel_id)
 
         # Update UI
-        self.channel_list.add_channel(channel_id)
+        channel_info = self.node.db_manager.get_channel_info(channel_id)
+        channel_type = channel_info.get("type", "public") if channel_info else "public"
+        self.channel_list.add_channel(channel_id, channel_type)
         self.message_view.add_system_message(f"Joined {channel_id}")
 
         logger.info(f"Joined channel: {channel_id}")
@@ -323,6 +383,8 @@ class TADTUIApp(Screen):
     def _cmd_help(self, args: list) -> None:
         """Handle /help command."""
         help_text = """Available Commands:
+  /create <#ch> [priv] - Create a channel (default: public)
+  /invite <node_id> <#ch> - Invite a peer to a private channel
   /join <#channel>      - Join a channel
   /leave <#channel>     - Leave a channel
   /switch <#channel>    - Switch to a channel
@@ -383,7 +445,9 @@ Multi-channel messaging: Type normally to send a message to the active channel."
 async def main() -> None:
     """Main entry point for the TAD TUI application."""
     # Create TAD node
-    node = TADNode(username="TUI_User")
+    username = "TUI_User"
+    profile_path = f"{username}_profile.json"
+    node = TADNode(username=username, profile_path=profile_path)
 
     try:
         await node.start()

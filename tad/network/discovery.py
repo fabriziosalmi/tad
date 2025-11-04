@@ -41,6 +41,7 @@ class DiscoveryService:
         node_id_b64: str,
         local_ip: str,
         tcp_port: int,
+        username: str,
         on_peer_found: Callable[[Tuple[str, int]], None],
         on_peer_removed: Optional[Callable[[str], None]] = None,
     ):
@@ -51,6 +52,7 @@ class DiscoveryService:
             node_id_b64: Base64-encoded node ID (public key)
             local_ip: Local IP address to bind to
             tcp_port: TCP port this node listens on
+            username: The username of the node
             on_peer_found: Async callback invoked when a new peer is discovered.
                           Should accept (peer_id, (ip, port))
             on_peer_removed: Optional async callback invoked when a peer disappears
@@ -58,6 +60,7 @@ class DiscoveryService:
         self.node_id_b64 = node_id_b64
         self.local_ip = local_ip
         self.tcp_port = tcp_port
+        self.username = username
         self.on_peer_found = on_peer_found
         self.on_peer_removed = on_peer_removed
 
@@ -107,8 +110,7 @@ class DiscoveryService:
         """
         Publish this node's service on the Zeroconf network.
         """
-        node_id_short = self.node_id_b64[:8]
-        service_name = f"TAD Node {node_id_short}.{self.SERVICE_TYPE}"
+        service_name = f"TAD Node {self.username}.{self.SERVICE_TYPE}"
 
         # Service properties (Zeroconf TXT record)
         properties = {
@@ -123,7 +125,7 @@ class DiscoveryService:
             addresses=[socket.inet_aton(self.local_ip)],
             port=self.tcp_port,
             properties=properties,
-            server=f"tad-{node_id_short}.local.",
+            server=f"tad-{self.username}.local.",
         )
 
         await self.aiozc.async_register_service(info)
@@ -231,3 +233,5 @@ class DiscoveryService:
 
         except Exception as e:
             logger.warning(f"Error handling peer removal: {e}")
+
+

@@ -351,7 +351,9 @@ class GossipProtocol:
 
     # ========== Broadcasting ==========
 
-    async def broadcast_message(self, content: str, channel_id: str = "#general") -> str:
+    async def broadcast_message(
+        self, content: str, channel_id: str = "#general", extra_payload: Dict = None
+    ) -> str:
         """
         Broadcast a message to a specific channel with automatic signing.
 
@@ -362,11 +364,15 @@ class GossipProtocol:
         Args:
             content: The message content
             channel_id: Target channel identifier (default: "#general")
+            extra_payload: Optional dictionary to merge into the payload
 
         Returns:
             The generated msg_id
         """
-        if not content.strip():
+        if isinstance(content, dict):
+            pass  # content is already a dict, no need to strip
+        elif not content.strip():
+            logger.warning("Ignoring empty message content")
             return ""
 
         # Create the payload (unsigned message data) with channel_id
@@ -378,6 +384,9 @@ class GossipProtocol:
             "content": content,
             "timestamp": timestamp,
         }
+
+        if extra_payload:
+            payload.update(extra_payload)
 
         # Sign the message (signature covers the channel_id in payload)
         signed_message = self.sign_message(payload)

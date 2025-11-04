@@ -35,6 +35,8 @@ class Identity:
         username: str,
         signing_key: nacl.signing.SigningKey,
         verify_key: nacl.signing.VerifyKey,
+        encryption_private_key: nacl.public.PrivateKey,
+        encryption_public_key: nacl.public.PublicKey,
     ):
         """
         Initialize an Identity.
@@ -43,12 +45,22 @@ class Identity:
             username: Human-readable username
             signing_key: Private signing key
             verify_key: Public verification key
+            encryption_private_key: Private key for encryption
+            encryption_public_key: Public key for encryption
         """
         self.username = username
         self.signing_key = signing_key
         self.verify_key = verify_key
+        self.encryption_private_key = encryption_private_key
+        self.encryption_public_key = encryption_public_key
         # Hex-encoded public key for network transmission
         self.verify_key_hex = verify_key.encode(
+            encoder=nacl.encoding.HexEncoder
+        ).decode("utf-8")
+        self.signing_key_hex = signing_key.encode(
+            encoder=nacl.encoding.HexEncoder
+        ).decode("utf-8")
+        self.encryption_public_key_hex = encryption_public_key.encode(
             encoder=nacl.encoding.HexEncoder
         ).decode("utf-8")
 
@@ -130,7 +142,9 @@ class IdentityManager:
             saved_username = profile_data.get("username")
             signing_key_hex = profile_data.get("signing_key_hex")
 
-            if not saved_username or not signing_key_hex:
+            encryption_private_key_hex = profile_data.get("encryption_private_key_hex")
+
+            if not saved_username or not signing_key_hex or not encryption_private_key_hex:
                 raise ValueError("Profile missing required fields")
 
             # Reconstruct keys from hex encoding
@@ -138,6 +152,10 @@ class IdentityManager:
                 signing_key_hex, encoder=nacl.encoding.HexEncoder
             )
             verify_key = signing_key.verify_key
+            encryption_private_key = nacl.public.PrivateKey(
+                encryption_private_key_hex, encoder=nacl.encoding.HexEncoder
+            )
+            encryption_public_key = encryption_private_key.public_key
 
             logger.info(f"Identity loaded successfully (username: {saved_username})")
 
@@ -145,6 +163,8 @@ class IdentityManager:
                 username=saved_username,
                 signing_key=signing_key,
                 verify_key=verify_key,
+                encryption_private_key=encryption_private_key,
+                encryption_public_key=encryption_public_key,
             )
 
         except json.JSONDecodeError as e:
@@ -166,11 +186,17 @@ class IdentityManager:
         signing_key = nacl.signing.SigningKey.generate()
         verify_key = signing_key.verify_key
 
+        # Generate new encryption key pair (Curve25519)
+        encryption_private_key = nacl.public.PrivateKey.generate()
+        encryption_public_key = encryption_private_key.public_key
+
         # Create identity object
         identity = Identity(
             username=username,
             signing_key=signing_key,
             verify_key=verify_key,
+            encryption_private_key=encryption_private_key,
+            encryption_public_key=encryption_public_key,
         )
 
         # Encode keys as hex strings for storage
@@ -178,6 +204,9 @@ class IdentityManager:
             encoder=nacl.encoding.HexEncoder
         ).decode("utf-8")
         verify_key_hex = identity.verify_key_hex
+        encryption_private_key_hex = encryption_private_key.encode(
+            encoder=nacl.encoding.HexEncoder
+        ).decode("utf-8")
 
         # Create profile dictionary
         profile_data = {
@@ -185,6 +214,7 @@ class IdentityManager:
             "username": username,
             "signing_key_hex": signing_key_hex,
             "verify_key_hex": verify_key_hex,
+            "encryption_private_key_hex": encryption_private_key_hex,
         }
 
         # Save to file
