@@ -3,6 +3,7 @@ TAD Node - Orchestrator for all network and protocol components
 
 This module provides the TADNode class which manages:
 - Cryptographic identity and persistence (via IdentityManager)
+- Message persistence (via DatabaseManager - Milestone 4)
 - Channel subscriptions (Milestone 3)
 - Network service components (Discovery, Connection, Gossip)
 - Component lifecycle (start/stop)
@@ -12,12 +13,13 @@ This module provides the TADNode class which manages:
 import asyncio
 import logging
 import socket
-from typing import Callable, Optional, Set, Tuple
+from typing import Callable, Dict, List, Optional, Set, Tuple
 
 from .identity import IdentityManager
 from .network.connection import ConnectionManager
 from .network.discovery import DiscoveryService
 from .network.gossip import GossipProtocol
+from .persistence import DatabaseManager
 
 logger = logging.getLogger(__name__)
 
@@ -28,6 +30,7 @@ class TADNode:
 
     Manages:
     - Identity (Ed25519 key generation and persistence via IdentityManager)
+    - Message persistence (SQLite storage via DatabaseManager - Milestone 4)
     - Channel subscriptions (Tribes - Milestone 3)
     - Network services (Discovery, Connections, Gossip Protocol)
     - Lifecycle management (start, stop)
@@ -37,6 +40,7 @@ class TADNode:
     def __init__(
         self,
         username: str = "DefaultUser",
+        db_path: str = "tad_node.db",
         on_message_received: Optional[Callable[[dict], None]] = None,
         on_peer_discovered: Optional[Callable[[str, Tuple[str, int]], None]] = None,
         on_peer_removed: Optional[Callable[[str], None]] = None,
@@ -46,6 +50,7 @@ class TADNode:
 
         Args:
             username: Username for this node's identity
+            db_path: Path to SQLite database for message persistence (Milestone 4)
             on_message_received: Callback invoked when a message is received
             on_peer_discovered: Callback invoked when a new peer is discovered
             on_peer_removed: Callback invoked when a peer disappears
@@ -55,6 +60,9 @@ class TADNode:
         # Identity management
         self.identity_manager = IdentityManager(profile_path="profile.json")
         self.identity = None
+
+        # Database persistence (Milestone 4)
+        self.db_manager = DatabaseManager(db_path=db_path)
 
         # Node identifiers (set during start)
         self.node_id_b64: str = ""
@@ -143,6 +151,7 @@ class TADNode:
         1. Stop DiscoveryService
         2. Stop GossipProtocol
         3. Stop ConnectionManager
+        4. Close database connection
         """
         logger.info("Stopping TAD node...")
 
@@ -156,6 +165,10 @@ class TADNode:
 
         if self.connection_manager:
             await self.connection_manager.stop()
+
+        # Close database connection (Milestone 4)
+        if self.db_manager:
+            self.db_manager.close()
 
         logger.info("TAD node stopped")
 
@@ -196,8 +209,14 @@ class TADNode:
         """
         Handle a message after gossip protocol processing (and verification).
 
-        Invokes the user callback if provided.
+        1. Store the message in the database (Milestone 4)
+        2. Invoke the user callback if provided
         """
+        # Persist message to database (Milestone 4)
+        if self.db_manager:
+            self.db_manager.store_message(message)
+
+        # Invoke user callback
         if self.on_message_received:
             try:
                 if asyncio.iscoroutinefunction(self.on_message_received):
@@ -279,6 +298,43 @@ class TADNode:
             Set of channel IDs
         """
         return self.subscribed_channels.copy()
+
+    # ========== Message History (Milestone 4) ==========
+
+    async def load_channel_history(self, channel_id: str, last_n: int = 50) -> List[Dict]:
+        """
+        Load message history for a channel from persistent storage.
+
+        Used during UI initialization to pre-populate message view with historical messages
+        before displaying real-time messages.
+
+        Args:
+            channel_id: Channel to load history for
+            last_n: Number of recent messages to load (default: 50)
+
+        Returns:
+            List of message dictionaries from database
+        """
+        if not self.db_manager:
+            return []
+
+        logger.info(f"Loading history for {channel_id} (last {last_n} messages)")
+        messages = self.db_manager.get_messages_for_channel(channel_id, last_n=last_n)
+        logger.info(f"Loaded {len(messages)} historical messages for {channel_id}")
+
+        return messages
+
+    def get_database_stats(self) -> Dict:
+        """
+        Get database statistics for monitoring and debugging.
+
+        Returns:
+            Dictionary containing message counts and storage info
+        """
+        if not self.db_manager:
+            return {}
+
+        return self.db_manager.get_database_stats()
 
     # ========== Public API ==========
 
