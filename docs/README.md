@@ -1,6 +1,6 @@
-# TAZCOM Documentation
+# TAD Documentation
 
-This directory contains the VitePress documentation for TAZCOM.
+This directory contains the VitePress documentation for TAD.
 
 ## Local Development
 

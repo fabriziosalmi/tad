@@ -2,12 +2,12 @@
 layout: home
 
 hero:
-  name: TAZCOM
+  name: TAD
   text: Tactical Autonomous Zone Communications
   tagline: P2P decentralized chat for offline-first communities
   image:
     src: /logo.svg
-    alt: TAZCOM
+    alt: TAD
   actions:
     - theme: brand
       text: Get Started
@@ -44,7 +44,7 @@ features:
 
 ## Quick Start
 
-Install and run TAZCOM in 30 seconds:
+Install and run TAD in 30 seconds:
 
 ```bash
 # Automatic installation
@@ -53,14 +53,14 @@ cd tad
 ./install.sh
 
 # Start chatting
-./tazcom
+./tad
 ```
 
 Nodes on the same network will auto-discover each other!
 
-## What is TAZCOM?
+## What is TAD?
 
-TAZCOM is a **peer-to-peer, decentralized chat system** designed for offline-first communication in environments where traditional infrastructure fails or is absent:
+TAD is a **peer-to-peer, decentralized chat system** designed for offline-first communication in environments where traditional infrastructure fails or is absent:
 
 - 🎉 **Free parties** - Coordinate without cell service
 - 🏕️ **TAZ (Temporary Autonomous Zones)** - Community self-organization
@@ -89,7 +89,7 @@ TAZCOM is a **peer-to-peer, decentralized chat system** designed for offline-fir
 
 ## Feature Status
 
-**FASE 1 - MVP** ✅ **COMPLETE**
+**v1.0 - MVP** ✅ **COMPLETE**
 
 - [x] mDNS peer discovery
 - [x] Direct TCP connections  
@@ -101,7 +101,7 @@ TAZCOM is a **peer-to-peer, decentralized chat system** designed for offline-fir
 - [x] Export/import functionality
 - [x] 97 passing tests (100% coverage)
 
-**FASE 2 - Future** 🔮
+**Future - Future** 🔮
 
 - [ ] Message search (/search command)
 - [ ] Emoji reactions
@@ -115,7 +115,7 @@ TAZCOM is a **peer-to-peer, decentralized chat system** designed for offline-fir
   <div class="custom-block tip">
     <p class="custom-block-title">📚 Complete Documentation</p>
     <ul>
-      <li><a href="/guide/getting-started">Getting Started</a> - Install and run TAZCOM</li>
+      <li><a href="/guide/getting-started">Getting Started</a> - Install and run TAD</li>
       <li><a href="/guide/user-guide">User Guide</a> - All commands and features</li>
       <li><a href="/guide/deployment">Deployment</a> - systemd, Docker, Raspberry Pi</li>
       <li><a href="/reference/architecture">Architecture</a> - Technical deep dive</li>

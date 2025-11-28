@@ -1,19 +1,19 @@
-# TAZCOM: Tactical Autonomous Zone Communications
+# TAD: Tactical Autonomous Decentralized
 
-**[ Status: FASE 1 - COMPLETE ✅ | MVP Production-Ready ]**
+**[ Status: Production-Ready MVP ✅ ]**
 
 [![Documentation](https://img.shields.io/badge/docs-VitePress-blue)](https://fabriziosalmi.github.io/tad/)
 [![Tests](https://img.shields.io/badge/tests-97%20passing-success)](tests/)
 [![Python](https://img.shields.io/badge/python-3.8+-blue)](https://www.python.org/)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-*"La rete non è qualcosa che usi. La rete è dove sei. La rete siamo noi."*
+*Peer-to-peer decentralized chat for offline-first communities*
 
 ---
 
-## 🎉 FASE 1 COMPLETE - MVP READY!
+## 🎉 Production-Ready MVP
 
-**TAZCOM** is a **production-ready** P2P decentralized chat system with:
+**TAD** is a **production-ready** P2P decentralized chat system with:
 
 - ✅ **Zero Configuration** - Auto-discovery via mDNS
 - ✅ **Multi-Channel Chat** - Professional terminal interface  
@@ -35,43 +35,41 @@ Quick links:
 - [Architecture](https://fabriziosalmi.github.io/tad/reference/architecture) - Technical deep dive
 
 Or browse local docs:
-- [START_HERE.md](START_HERE.md) - Project overview
 - [USER_GUIDE.md](USER_GUIDE.md) - Complete user manual
 - [DEPLOYMENT.md](DEPLOYMENT.md) - Installation guide
-- [FASE_1_COMPLETE.md](docs/reference/architecture.md) - Technical architecture
 
 ---
 
 ## ⚡ Quick Install
 
-```bash
+\`\`\`bash
 # Automatic installation (recommended)
 git clone https://github.com/fabriziosalmi/tad.git
 cd tad
 ./install.sh
 
-# Start TAZCOM
-./tazcom
-```
+# Start TAD
+./tad
+\`\`\`
 
 **Manual installation:**
-```bash
+\`\`\`bash
 pip install -r requirements.txt
 python -m tad.main
-```
+\`\`\`
 
 **Uninstall:**
-```bash
+\`\`\`bash
 ./uninstall.sh
-```
+\`\`\`
 
 ---
 
 ## 🚀 Quick Start
 
-```bash
-# Start TAZCOM
-./tazcom
+\`\`\`bash
+# Start TAD
+./tad
 
 # TUI commands:
 /help                           # List all commands
@@ -79,15 +77,15 @@ python -m tad.main
 /invite <node_id> #myChannel    # Invite peer to channel
 /export                         # Backup messages
 /peers                          # Show connected peers
-```
+\`\`\`
 
 **Zero configuration needed!** Nodes auto-discover on the same network.
 
 ---
 
-## 🌟 What is TAZCOM?
+## 🌟 What is TAD?
 
-TAZCOM is a **peer-to-peer, decentralized chat system** designed for offline-first communication in environments where traditional infrastructure fails or is absent:
+TAD is a **peer-to-peer, decentralized chat system** designed for offline-first communication in environments where traditional infrastructure fails or is absent:
 
 - 🎉 **Free Parties** - Coordinate without cell service
 - 🏕️ **TAZ (Temporary Autonomous Zones)** - Community self-organization
@@ -106,7 +104,7 @@ TAZCOM is a **peer-to-peer, decentralized chat system** designed for offline-fir
 
 ## 🏗️ Architecture
 
-```
+\`\`\`
 ┌─────────────┐     mDNS      ┌─────────────┐    Gossip     ┌─────────────┐
 │   Node A    │◄────────────► │   Node B    │◄─────────────►│   Node C    │
 │             │   Discovery   │             │   Protocol    │             │
@@ -114,7 +112,7 @@ TAZCOM is a **peer-to-peer, decentralized chat system** designed for offline-fir
 │  • SQLite   │     TCP       │  • AES-GCM  │     TCP       │  • Textual  │
 │  • Textual  │◄────────────► │  • Gossip   │◄─────────────►│  • Gossip   │
 └─────────────┘   Messages    └─────────────┘   Messages    └─────────────┘
-```
+\`\`\`
 
 **Technologies:**
 - **mDNS/Zeroconf** - Peer discovery
@@ -128,9 +126,7 @@ TAZCOM is a **peer-to-peer, decentralized chat system** designed for offline-fir
 
 ---
 
-## ✅ Feature Status
-
-**FASE 1 - MVP** ✅ **COMPLETE**
+## ✅ Current Features
 
 - [x] mDNS peer discovery
 - [x] Direct TCP connections
@@ -143,9 +139,9 @@ TAZCOM is a **peer-to-peer, decentralized chat system** designed for offline-fir
 - [x] Message signing (Ed25519)
 - [x] 97 passing tests
 
-**FASE 2 - Future** 🔮
+## 🔮 Planned Features
 
-- [ ] Message search (`/search` command)
+- [ ] Message search (\`/search\` command)
 - [ ] Emoji reactions
 - [ ] File sharing
 - [ ] Voice messages
@@ -172,4 +168,3 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 **Happy chatting! 🎉**
 
 For support, open an issue on [GitHub](https://github.com/fabriziosalmi/tad/issues).
-

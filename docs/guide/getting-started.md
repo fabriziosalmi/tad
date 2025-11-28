@@ -1,10 +1,10 @@
 # Getting Started
 
-Welcome to TAZCOM! This guide will help you get up and running in minutes.
+Welcome to TAD! This guide will help you get up and running in minutes.
 
-## What is TAZCOM?
+## What is TAD?
 
-TAZCOM (Tactical Autonomous Zone Communications) is a **peer-to-peer, decentralized chat system** designed for offline-first communication. It works on local networks without internet access and provides end-to-end encrypted private channels.
+TAD (Tactical Autonomous Zone Communications) is a **peer-to-peer, decentralized chat system** designed for offline-first communication. It works on local networks without internet access and provides end-to-end encrypted private channels.
 
 ### Perfect For
 
@@ -26,8 +26,8 @@ cd tad
 # Run installer
 ./install.sh
 
-# Start TAZCOM
-./tazcom
+# Start TAD
+./tad
 ```
 
 The installer will:
@@ -51,13 +51,13 @@ source venv/bin/activate
 # Install dependencies
 pip install -r requirements.txt
 
-# Run TAZCOM
+# Run TAD
 python -m tad.main
 ```
 
 ## First Run
 
-When you start TAZCOM for the first time:
+When you start TAD for the first time:
 
 1. **Identity Generation** - Cryptographic keys are created automatically
 2. **Database Creation** - SQLite database initialized  
@@ -66,7 +66,7 @@ When you start TAZCOM for the first time:
 
 ```
 ┌─────────────────────────────────────────────────┐
-│                 TAZCOM v1.0                     │
+│                 TAD v1.0                     │
 ├──────────┬────────────────────────┬─────────────┤
 │          │                        │             │
 │ Channels │    Message History     │   Peers     │
@@ -123,7 +123,7 @@ When you start TAZCOM for the first time:
 
 ### Nodes Not Discovering
 
-**Problem:** Started TAZCOM but no peers appear.
+**Problem:** Started TAD but no peers appear.
 
 **Solutions:**
 1. Ensure devices on same network
@@ -146,12 +146,12 @@ pip install -r requirements.txt
 
 ### Permission Denied
 
-**Problem:** Cannot run `./install.sh` or `./tazcom`.
+**Problem:** Cannot run `./install.sh` or `./tad`.
 
 **Solution:**
 ```bash
 chmod +x install.sh
-chmod +x tazcom
+chmod +x tad
 ```
 
 ## Getting Help

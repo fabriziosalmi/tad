@@ -1,7 +1,7 @@
 import { defineConfig } from 'vitepress'
 
 export default defineConfig({
-  title: 'TAZCOM',
+  title: 'TAD',
   description: 'Tactical Autonomous Zone Communications - P2P Decentralized Chat',
   
   base: '/tad/',
@@ -73,7 +73,7 @@ export default defineConfig({
         {
           text: 'API Documentation',
           items: [
-            { text: 'TAZCOMNode', link: '/reference/api-node' },
+            { text: 'TADNode', link: '/reference/api-node' },
             { text: 'Discovery', link: '/reference/api-discovery' },
             { text: 'Gossip Protocol', link: '/reference/api-gossip' },
             { text: 'Encryption', link: '/reference/api-encryption' },
@@ -97,7 +97,7 @@ export default defineConfig({
 
     footer: {
       message: 'Released under the MIT License.',
-      copyright: 'Copyright © 2024-2025 TAZCOM Contributors'
+      copyright: 'Copyright © 2024-2025 TAD Contributors'
     },
 
     search: {

@@ -39,7 +39,7 @@ Download from [python.org](https://www.python.org/downloads/)
 
 ### Method 1: Automatic Installer (Recommended)
 
-The easiest way to install TAZCOM:
+The easiest way to install TAD:
 
 ```bash
 git clone https://github.com/fabriziosalmi/tad.git
@@ -81,7 +81,7 @@ pip install -r requirements.txt
 # 6. Verify installation
 python -m pytest tests/ -v
 
-# 7. Run TAZCOM
+# 7. Run TAD
 python -m tad.main
 ```
 
@@ -91,28 +91,28 @@ For multi-user systems:
 
 ```bash
 # Install to /opt (requires root)
-sudo git clone https://github.com/fabriziosalmi/tad.git /opt/tazcom
-cd /opt/tazcom
+sudo git clone https://github.com/fabriziosalmi/tad.git /opt/tad
+cd /opt/tad
 
 # Create dedicated user
-sudo useradd -r -s /bin/false tazcom
+sudo useradd -r -s /bin/false tad
 
 # Run installer
 sudo ./install.sh
 
 # Set permissions
-sudo chown -R tazcom:tazcom /opt/tazcom
+sudo chown -R tad:tad /opt/tad
 
 # Create global launcher
-sudo ln -s /opt/tazcom/tazcom /usr/local/bin/tazcom
+sudo ln -s /opt/tad/tad /usr/local/bin/tad
 
 # Now any user can run
-tazcom
+tad
 ```
 
 ## Dependency Details
 
-TAZCOM requires these Python packages:
+TAD requires these Python packages:
 
 ```txt
 textual>=0.40.0        # Terminal UI framework
@@ -166,7 +166,7 @@ python -m pytest tests/ -v
 
 ```bash
 python -c "
-from tad.node import TAZCOMNode
+from tad.node import TADNode
 from tad.crypto.e2ee import E2EEManager
 from tad.network.discovery import DiscoveryService
 print('✓ All imports successful')
@@ -176,7 +176,7 @@ print('✓ All imports successful')
 ### Generate Identity
 
 ```bash
-# Run TAZCOM once to generate identity
+# Run TAD once to generate identity
 python -m tad.main
 
 # Check files created
@@ -205,7 +205,7 @@ tad/
 ├── docs/               # Documentation
 ├── profile.json        # Your identity (created on first run)
 ├── tad_node.db         # Message database (created on first run)
-├── tazcom              # Launcher script
+├── tad              # Launcher script
 ├── install.sh          # Installer
 ├── uninstall.sh        # Uninstaller
 └── requirements.txt    # Dependencies
@@ -223,7 +223,7 @@ tad/
 - 📦 Can be backed up with `/export` command
 - 🔄 Portable across devices
 
-## Updating TAZCOM
+## Updating TAD
 
 ### Standard Installation
 
@@ -237,11 +237,11 @@ pip install -r requirements.txt --upgrade
 ### System-Wide Installation
 
 ```bash
-sudo systemctl stop tazcom  # If running as service
-cd /opt/tazcom
+sudo systemctl stop tad  # If running as service
+cd /opt/tad
 sudo git pull
-sudo -u tazcom ./venv/bin/pip install -r requirements.txt --upgrade
-sudo systemctl start tazcom
+sudo -u tad ./venv/bin/pip install -r requirements.txt --upgrade
+sudo systemctl start tad
 ```
 
 ## Uninstallation
@@ -289,7 +289,7 @@ pyenv local 3.11.0
 
 ### Permission Errors
 
-**Error:** `Permission denied: '/opt/tazcom'`
+**Error:** `Permission denied: '/opt/tad'`
 
 **Solution:**
 ```bash
@@ -334,7 +334,7 @@ python3 -m venv venv
 
 ## Next Steps
 
-- 🚀 [Quick Start](/guide/quick-start) - Start using TAZCOM
+- 🚀 [Quick Start](/guide/quick-start) - Start using TAD
 - 📖 [User Guide](/guide/user-guide) - Learn all commands
 - 🔧 [Deployment](/guide/deployment) - Production setups
 - 🐳 [Docker](/guide/docker) - Container deployment

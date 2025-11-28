@@ -1,5 +1,5 @@
 [Unit]
-Description=TAZCOM P2P Chat Service
+Description=TAD P2P Chat Service
 Documentation=https://github.com/yourusername/tad
 After=network.target network-online.target
 Wants=network-online.target
@@ -10,10 +10,10 @@ User=%i
 Group=%i
 
 # Working directory (adjust to your installation path)
-WorkingDirectory=/opt/tazcom
+WorkingDirectory=/opt/tad
 
 # Start command (adjust path to your venv)
-ExecStart=/opt/tazcom/venv/bin/python -m tad.main
+ExecStart=/opt/tad/venv/bin/python -m tad.main
 
 # Restart policy
 Restart=on-failure
@@ -24,14 +24,14 @@ StartLimitIntervalSec=300
 # Logging
 StandardOutput=journal
 StandardError=journal
-SyslogIdentifier=tazcom
+SyslogIdentifier=tad
 
 # Security hardening
 NoNewPrivileges=true
 PrivateTmp=true
 ProtectSystem=strict
 ProtectHome=read-only
-ReadWritePaths=/opt/tazcom
+ReadWritePaths=/opt/tad
 ProtectKernelTunables=true
 ProtectKernelModules=true
 ProtectControlGroups=true
@@ -47,28 +47,28 @@ WantedBy=multi-user.target
 # Installation instructions:
 #
 # 1. Copy this file:
-#    sudo cp tazcom.service /etc/systemd/system/
+#    sudo cp tad.service /etc/systemd/system/
 #
 # 2. Edit paths in WorkingDirectory and ExecStart if needed:
-#    sudo nano /etc/systemd/system/tazcom.service
+#    sudo nano /etc/systemd/system/tad.service
 #
 # 3. Reload systemd:
 #    sudo systemctl daemon-reload
 #
 # 4. Enable on boot:
-#    sudo systemctl enable tazcom
+#    sudo systemctl enable tad
 #
 # 5. Start service:
-#    sudo systemctl start tazcom
+#    sudo systemctl start tad
 #
 # 6. Check status:
-#    sudo systemctl status tazcom
+#    sudo systemctl status tad
 #
 # 7. View logs:
-#    sudo journalctl -u tazcom -f
+#    sudo journalctl -u tad -f
 #
 # 8. Stop service:
-#    sudo systemctl stop tazcom
+#    sudo systemctl stop tad
 #
 # 9. Restart service:
-#    sudo systemctl restart tazcom
+#    sudo systemctl restart tad

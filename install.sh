@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 #####################################################################
-# TAZCOM Automatic Installer
+# TAD Automatic Installer
 # 
-# This script automates the installation of TAZCOM on Linux/macOS
+# This script automates the installation of TAD on Linux/macOS
 # 
 # Usage:
 #   chmod +x install.sh
@@ -32,7 +32,7 @@ MIN_PYTHON_VERSION="3.8"
 VENV_DIR="venv"
 INSTALL_DIR="${INSTALL_DIR:-$(pwd)}"
 SYSTEMD_DIR="/etc/systemd/system"
-SERVICE_NAME="tazcom.service"
+SERVICE_NAME="tad.service"
 
 #####################################################################
 # Helper Functions
@@ -41,7 +41,7 @@ SERVICE_NAME="tazcom.service"
 print_header() {
     echo -e "${BLUE}"
     echo "╔════════════════════════════════════════════════════════════╗"
-    echo "║           TAZCOM Automatic Installer v1.0                 ║"
+    echo "║           TAD Automatic Installer v1.0                 ║"
     echo "║   Tactical Autonomous Zone Communications                  ║"
     echo "╚════════════════════════════════════════════════════════════╝"
     echo -e "${NC}"
@@ -78,7 +78,7 @@ check_os() {
         print_success "macOS detected"
     else
         print_error "Unsupported OS: $OSTYPE"
-        print_warning "TAZCOM is designed for Linux and macOS"
+        print_warning "TAD is designed for Linux and macOS"
         exit 1
     fi
 }
@@ -209,14 +209,14 @@ install_systemd_service() {
     if [[ -n "${SUDO}" ]]; then
         SERVICE_USER="$USER"
     else
-        read -p "Run TAZCOM as user [default: $USER]: " SERVICE_USER
+        read -p "Run TAD as user [default: $USER]: " SERVICE_USER
         SERVICE_USER="${SERVICE_USER:-$USER}"
     fi
     
     # Create service file
     cat > "/tmp/${SERVICE_NAME}" <<EOF
 [Unit]
-Description=TAZCOM P2P Chat Service
+Description=TAD P2P Chat Service
 After=network.target
 Wants=network-online.target
 
@@ -273,16 +273,16 @@ EOF
 create_launcher() {
     print_step "Creating launcher script..."
     
-    cat > "tazcom" <<'EOF'
+    cat > "tad" <<'EOF'
 #!/usr/bin/env bash
-# TAZCOM Launcher Script
+# TAD Launcher Script
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/venv/bin/activate"
 exec python -m tad.main "$@"
 EOF
     
-    chmod +x tazcom
-    print_success "Launcher created: ./tazcom"
+    chmod +x tad
+    print_success "Launcher created: ./tad"
 }
 
 #####################################################################
@@ -295,18 +295,18 @@ print_summary() {
     echo -e "${GREEN}║           Installation Complete! 🎉                        ║${NC}"
     echo -e "${GREEN}╚════════════════════════════════════════════════════════════╝${NC}"
     echo
-    echo "TAZCOM has been successfully installed!"
+    echo "TAD has been successfully installed!"
     echo
     echo "Quick Start:"
-    echo "  1. Run TAZCOM:      ./tazcom"
+    echo "  1. Run TAD:      ./tad"
     echo "  2. Or manually:     source venv/bin/activate && python -m tad.main"
     echo
     if [[ "$OS" == "linux" ]] && [[ -f "${SYSTEMD_DIR}/${SERVICE_NAME}" ]]; then
         echo "Systemd Service:"
-        echo "  • Status:   sudo systemctl status tazcom"
-        echo "  • Start:    sudo systemctl start tazcom"
-        echo "  • Stop:     sudo systemctl stop tazcom"
-        echo "  • Logs:     sudo journalctl -u tazcom -f"
+        echo "  • Status:   sudo systemctl status tad"
+        echo "  • Start:    sudo systemctl start tad"
+        echo "  • Stop:     sudo systemctl stop tad"
+        echo "  • Logs:     sudo journalctl -u tad -f"
         echo
     fi
     echo "Documentation:"
@@ -315,7 +315,7 @@ print_summary() {
     echo "  • Getting Started:  README.md"
     echo
     echo "Get Help:"
-    echo "  • Commands:         Type /help in TAZCOM"
+    echo "  • Commands:         Type /help in TAD"
     echo "  • Issues:           https://github.com/yourusername/tad/issues"
     echo
 }

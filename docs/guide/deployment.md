@@ -1,6 +1,6 @@
-# TAZCOM Deployment Guide
+# TAD Deployment Guide
 
-This guide covers different deployment scenarios for TAZCOM.
+This guide covers different deployment scenarios for TAD.
 
 ---
 
@@ -29,8 +29,8 @@ cd tad
 chmod +x install.sh
 ./install.sh
 
-# 3. Start TAZCOM
-./tazcom
+# 3. Start TAD
+./tad
 ```
 
 **Pros:**
@@ -46,28 +46,28 @@ chmod +x install.sh
 
 ## System-Wide Install (Multi-User)
 
-For shared machines where multiple users need TAZCOM.
+For shared machines where multiple users need TAD.
 
 ```bash
 # 1. Install to /opt (as root)
-sudo git clone https://github.com/yourusername/tad.git /opt/tazcom
-cd /opt/tazcom
+sudo git clone https://github.com/yourusername/tad.git /opt/tad
+cd /opt/tad
 
 # 2. Create dedicated user
-sudo useradd -r -s /bin/false -d /opt/tazcom tazcom
+sudo useradd -r -s /bin/false -d /opt/tad tad
 
 # 3. Run installer
 sudo ./install.sh
 
 # 4. Set permissions
-sudo chown -R tazcom:tazcom /opt/tazcom
-sudo chmod 755 /opt/tazcom
+sudo chown -R tad:tad /opt/tad
+sudo chmod 755 /opt/tad
 
 # 5. Create symlink for global access
-sudo ln -s /opt/tazcom/tazcom /usr/local/bin/tazcom
+sudo ln -s /opt/tad/tad /usr/local/bin/tad
 
 # 6. Users can now run
-tazcom
+tad
 ```
 
 **Pros:**
@@ -96,32 +96,32 @@ For always-on deployments (servers, routers, etc.).
 ### Manual (Linux)
 
 ```bash
-# 1. Install TAZCOM to /opt
-sudo cp -r tad /opt/tazcom
-cd /opt/tazcom
+# 1. Install TAD to /opt
+sudo cp -r tad /opt/tad
+cd /opt/tad
 ./install.sh
 
 # 2. Copy service file
-sudo cp tazcom.service /etc/systemd/system/
+sudo cp tad.service /etc/systemd/system/
 
 # 3. Edit service file (adjust paths)
-sudo nano /etc/systemd/system/tazcom.service
+sudo nano /etc/systemd/system/tad.service
 
 # 4. Enable and start
 sudo systemctl daemon-reload
-sudo systemctl enable tazcom
-sudo systemctl start tazcom
+sudo systemctl enable tad
+sudo systemctl start tad
 
 # 5. Check status
-sudo systemctl status tazcom
+sudo systemctl status tad
 
 # 6. View logs
-sudo journalctl -u tazcom -f
+sudo journalctl -u tad -f
 ```
 
 ### macOS (launchd)
 
-Create `~/Library/LaunchAgents/com.tazcom.plist`:
+Create `~/Library/LaunchAgents/com.tad.plist`:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -129,7 +129,7 @@ Create `~/Library/LaunchAgents/com.tazcom.plist`:
 <plist version="1.0">
 <dict>
     <key>Label</key>
-    <string>com.tazcom</string>
+    <string>com.tad</string>
     <key>ProgramArguments</key>
     <array>
         <string>/Users/youruser/tad/venv/bin/python</string>
@@ -143,17 +143,17 @@ Create `~/Library/LaunchAgents/com.tazcom.plist`:
     <key>KeepAlive</key>
     <true/>
     <key>StandardOutPath</key>
-    <string>/tmp/tazcom.log</string>
+    <string>/tmp/tad.log</string>
     <key>StandardErrorPath</key>
-    <string>/tmp/tazcom.error.log</string>
+    <string>/tmp/tad.error.log</string>
 </dict>
 </plist>
 ```
 
 Load service:
 ```bash
-launchctl load ~/Library/LaunchAgents/com.tazcom.plist
-launchctl start com.tazcom
+launchctl load ~/Library/LaunchAgents/com.tad.plist
+launchctl start com.tad
 ```
 
 ---
@@ -194,7 +194,7 @@ VOLUME /app/data
 EXPOSE 50000-51000/tcp
 EXPOSE 5353/udp
 
-# Run TAZCOM
+# Run TAD
 CMD ["python", "-m", "tad.main"]
 ```
 
@@ -202,24 +202,24 @@ CMD ["python", "-m", "tad.main"]
 
 ```bash
 # Build image
-docker build -t tazcom:latest .
+docker build -t tad:latest .
 
 # Run with host networking (required for mDNS)
 docker run -d \
-  --name tazcom \
+  --name tad \
   --network host \
   --restart unless-stopped \
-  -v tazcom_data:/app/data \
-  tazcom:latest
+  -v tad_data:/app/data \
+  tad:latest
 
 # View logs
-docker logs -f tazcom
+docker logs -f tad
 
 # Stop
-docker stop tazcom
+docker stop tad
 
 # Remove
-docker rm tazcom
+docker rm tad
 ```
 
 ### Docker Compose
@@ -230,18 +230,18 @@ Create `docker-compose.yml`:
 version: '3.8'
 
 services:
-  tazcom:
+  tad:
     build: .
-    container_name: tazcom
+    container_name: tad
     network_mode: host
     restart: unless-stopped
     volumes:
-      - tazcom_data:/app/data
+      - tad_data:/app/data
     environment:
       - PYTHONUNBUFFERED=1
 
 volumes:
-  tazcom_data:
+  tad_data:
 ```
 
 Run:
@@ -275,7 +275,7 @@ sudo apt install -y \
     libsodium-dev \
     git
 
-# 3. Clone TAZCOM
+# 3. Clone TAD
 cd ~
 git clone https://github.com/yourusername/tad.git
 cd tad
@@ -287,12 +287,12 @@ cd tad
 # When prompted, select "yes" for systemd service
 
 # 6. Enable on boot
-sudo systemctl enable tazcom
+sudo systemctl enable tad
 ```
 
 ### Optimize for Low Power
 
-Edit `/etc/systemd/system/tazcom.service`:
+Edit `/etc/systemd/system/tad.service`:
 
 ```ini
 # Add to [Service] section
@@ -304,7 +304,7 @@ Nice=10             # Lower priority
 Reload:
 ```bash
 sudo systemctl daemon-reload
-sudo systemctl restart tazcom
+sudo systemctl restart tad
 ```
 
 ---
@@ -319,7 +319,7 @@ sudo systemctl restart tazcom
 # Allow mDNS discovery
 sudo ufw allow 5353/udp
 
-# Allow TAZCOM connections (adjust port range)
+# Allow TAD connections (adjust port range)
 sudo ufw allow 50000:51000/tcp
 ```
 
@@ -329,7 +329,7 @@ sudo ufw allow 50000:51000/tcp
 # mDNS
 sudo iptables -A INPUT -p udp --dport 5353 -j ACCEPT
 
-# TAZCOM
+# TAD
 sudo iptables -A INPUT -p tcp --dport 50000:51000 -j ACCEPT
 
 # Save rules
@@ -369,13 +369,13 @@ chmod 600 profile.json
 chmod 700 tad_node.db
 
 # Make scripts executable only
-chmod 755 install.sh uninstall.sh tazcom
+chmod 755 install.sh uninstall.sh tad
 ```
 
 ### 2. SELinux (RHEL/Fedora)
 
 ```bash
-# Allow TAZCOM to bind ports
+# Allow TAD to bind ports
 sudo semanage port -a -t http_port_t -p tcp 50000-51000
 
 # If running as service
@@ -384,18 +384,18 @@ sudo setsebool -P httpd_can_network_connect 1
 
 ### 3. AppArmor (Ubuntu)
 
-Create `/etc/apparmor.d/usr.bin.tazcom`:
+Create `/etc/apparmor.d/usr.bin.tad`:
 
 ```
 #include <tunables/global>
 
-/opt/tazcom/venv/bin/python {
+/opt/tad/venv/bin/python {
   #include <abstractions/base>
   #include <abstractions/python>
 
-  /opt/tazcom/** r,
-  /opt/tazcom/tad_node.db rw,
-  /opt/tazcom/profile.json r,
+  /opt/tad/** r,
+  /opt/tad/tad_node.db rw,
+  /opt/tad/profile.json r,
 
   network inet stream,
   network inet dgram,
@@ -404,7 +404,7 @@ Create `/etc/apparmor.d/usr.bin.tazcom`:
 
 Load profile:
 ```bash
-sudo apparmor_parser -r /etc/apparmor.d/usr.bin.tazcom
+sudo apparmor_parser -r /etc/apparmor.d/usr.bin.tad
 ```
 
 ### 4. Minimal Privileges
@@ -413,13 +413,13 @@ Run as dedicated user (not root):
 
 ```bash
 # Create user
-sudo useradd -r -s /bin/false tazcom
+sudo useradd -r -s /bin/false tad
 
 # Set ownership
-sudo chown -R tazcom:tazcom /opt/tazcom
+sudo chown -R tad:tad /opt/tad
 
-# Run as tazcom user
-sudo -u tazcom /opt/tazcom/tazcom
+# Run as tad user
+sudo -u tad /opt/tad/tad
 ```
 
 ---
@@ -430,13 +430,13 @@ sudo -u tazcom /opt/tazcom/tazcom
 
 ```bash
 # Check logs
-sudo journalctl -u tazcom -n 50
+sudo journalctl -u tad -n 50
 
 # Check service status
-sudo systemctl status tazcom
+sudo systemctl status tad
 
 # Test manually
-sudo -u tazcom /opt/tazcom/venv/bin/python -m tad.main
+sudo -u tad /opt/tad/venv/bin/python -m tad.main
 ```
 
 ### Nodes Not Discovering
@@ -444,7 +444,7 @@ sudo -u tazcom /opt/tazcom/venv/bin/python -m tad.main
 ```bash
 # Check mDNS service
 sudo systemctl status avahi-daemon  # Linux
-dns-sd -B _tazcom._tcp              # macOS
+dns-sd -B _tad._tcp              # macOS
 
 # Check firewall
 sudo ufw status
@@ -459,10 +459,10 @@ ping <other-node-ip>
 ```bash
 # Monitor resources
 htop
-systemctl status tazcom
+systemctl status tad
 
 # Limit resources (systemd)
-sudo systemctl edit tazcom
+sudo systemctl edit tad
 # Add:
 # [Service]
 # MemoryMax=256M
@@ -471,7 +471,7 @@ sudo systemctl edit tazcom
 
 ---
 
-## Updating TAZCOM
+## Updating TAD
 
 ### Standard Install
 
@@ -485,11 +485,11 @@ pip install -r requirements.txt --upgrade
 ### Service Install
 
 ```bash
-sudo systemctl stop tazcom
-cd /opt/tazcom
+sudo systemctl stop tad
+cd /opt/tad
 sudo git pull
-sudo -u tazcom ./venv/bin/pip install -r requirements.txt --upgrade
-sudo systemctl start tazcom
+sudo -u tad ./venv/bin/pip install -r requirements.txt --upgrade
+sudo systemctl start tad
 ```
 
 ---
@@ -500,12 +500,12 @@ sudo systemctl start tazcom
 
 ```bash
 # Essential files
-tar -czf tazcom_backup.tar.gz \
+tar -czf tad_backup.tar.gz \
     profile.json \
     tad_node.db
 
 # Or use export command
-./tazcom
+./tad
 > /export
 ```
 
@@ -513,10 +513,10 @@ tar -czf tazcom_backup.tar.gz \
 
 ```bash
 # Extract backup
-tar -xzf tazcom_backup.tar.gz
+tar -xzf tad_backup.tar.gz
 
 # Or use import command
-./tazcom
+./tad
 > /import backup.json
 ```
 
@@ -541,7 +541,7 @@ sqlite3 tad_node.db "ANALYZE;"
 python -O -m tad.main
 
 # Or in systemd service
-ExecStart=/opt/tazcom/venv/bin/python -O -m tad.main
+ExecStart=/opt/tad/venv/bin/python -O -m tad.main
 ```
 
 ---

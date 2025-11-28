@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 #####################################################################
-# TAZCOM Uninstaller
+# TAD Uninstaller
 # 
-# This script removes TAZCOM from your system
+# This script removes TAD from your system
 # 
 # Usage:
 #   chmod +x uninstall.sh
@@ -22,7 +22,7 @@ NC='\033[0m'
 print_header() {
     echo -e "${RED}"
     echo "╔════════════════════════════════════════════════════════════╗"
-    echo "║           TAZCOM Uninstaller                              ║"
+    echo "║           TAD Uninstaller                              ║"
     echo "╚════════════════════════════════════════════════════════════╝"
     echo -e "${NC}"
 }
@@ -50,13 +50,13 @@ fi
 
 print_header
 
-echo "This will remove TAZCOM from your system."
+echo "This will remove TAD from your system."
 echo
 print_warning "The following will be deleted:"
 echo "  • Python virtual environment (venv/)"
-echo "  • Launcher script (tazcom)"
-if [[ "$OS" == "linux" ]] && [[ -f "/etc/systemd/system/tazcom.service" ]]; then
-    echo "  • Systemd service (/etc/systemd/system/tazcom.service)"
+echo "  • Launcher script (tad)"
+if [[ "$OS" == "linux" ]] && [[ -f "/etc/systemd/system/tad.service" ]]; then
+    echo "  • Systemd service (/etc/systemd/system/tad.service)"
 fi
 echo
 print_warning "The following will be PRESERVED:"
@@ -73,20 +73,20 @@ if [[ ! $REPLY =~ ^[Yy]$ ]]; then
 fi
 
 # Stop and remove systemd service
-if [[ "$OS" == "linux" ]] && [[ -f "/etc/systemd/system/tazcom.service" ]]; then
+if [[ "$OS" == "linux" ]] && [[ -f "/etc/systemd/system/tad.service" ]]; then
     print_step "Removing systemd service..."
     
-    if systemctl is-active --quiet tazcom; then
-        sudo systemctl stop tazcom
+    if systemctl is-active --quiet tad; then
+        sudo systemctl stop tad
         print_success "Service stopped"
     fi
     
-    if systemctl is-enabled --quiet tazcom; then
-        sudo systemctl disable tazcom
+    if systemctl is-enabled --quiet tad; then
+        sudo systemctl disable tad
         print_success "Service disabled"
     fi
     
-    sudo rm /etc/systemd/system/tazcom.service
+    sudo rm /etc/systemd/system/tad.service
     sudo systemctl daemon-reload
     print_success "Service removed"
 fi
@@ -99,9 +99,9 @@ if [[ -d "venv" ]]; then
 fi
 
 # Remove launcher
-if [[ -f "tazcom" ]]; then
+if [[ -f "tad" ]]; then
     print_step "Removing launcher..."
-    rm tazcom
+    rm tad
     print_success "Launcher removed"
 fi
 
@@ -116,7 +116,7 @@ echo -e "${GREEN}╔════════════════════
 echo -e "${GREEN}║           Uninstall Complete                              ║${NC}"
 echo -e "${GREEN}╚════════════════════════════════════════════════════════════╝${NC}"
 echo
-echo "TAZCOM has been uninstalled."
+echo "TAD has been uninstalled."
 echo
 echo "Preserved files:"
 echo "  • profile.json (your identity)"
@@ -125,6 +125,6 @@ echo "  • tad/ (source code)"
 echo "  • requirements.txt"
 echo "  • install.sh, uninstall.sh"
 echo
-echo "To completely remove TAZCOM:"
+echo "To completely remove TAD:"
 echo "  cd .. && rm -rf tad/"
 echo

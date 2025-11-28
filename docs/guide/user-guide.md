@@ -1,6 +1,6 @@
-# TAZCOM User Guide
+# TAD User Guide
 
-**Version:** FASE 1 Complete (v1.0)
+**Version:** v1.0 Complete (v1.0)
 **Date:** November 28, 2025
 
 ---
@@ -23,7 +23,7 @@
 
 ## Introduction
 
-**TAZCOM** (Tactical Autonomous Zone Communications) is a peer-to-peer, decentralized chat system designed for offline-first communication. It works on local networks without internet access and provides end-to-end encrypted private channels.
+**TAD** (Tactical Autonomous Zone Communications) is a peer-to-peer, decentralized chat system designed for offline-first communication. It works on local networks without internet access and provides end-to-end encrypted private channels.
 
 ### Key Features
 - ✅ **Zero Configuration** - Auto-discovery via mDNS
@@ -41,7 +41,7 @@
 # 1. Install dependencies
 pip install -r requirements.txt
 
-# 2. Start TAZCOM
+# 2. Start TAD
 python -m tad.main
 
 # 3. Nodes on the same network will auto-discover each other!
@@ -75,7 +75,7 @@ pip install -r requirements.txt
 # Test installation
 python -m pytest tests/ -v
 
-# Run TAZCOM
+# Run TAD
 python -m tad.main
 ```
 
@@ -92,13 +92,13 @@ cryptography>=41.0.0   # AES-GCM encryption
 
 ## Basic Usage
 
-### Starting TAZCOM
+### Starting TAD
 
 ```bash
 python -m tad.main
 ```
 
-On first run, TAZCOM will:
+On first run, TAD will:
 1. Generate a cryptographic identity (Ed25519 + X25519 keys)
 2. Create `profile.json` with your identity
 3. Create `tad_node.db` SQLite database
@@ -109,7 +109,7 @@ On first run, TAZCOM will:
 
 ```
 ┌─────────────────────────────────────────────────┐
-│                 TAZCOM v1.0                     │
+│                 TAD v1.0                     │
 ├──────────┬────────────────────────┬─────────────┤
 │          │                        │             │
 │ Channels │    Message History     │   Peers     │
@@ -510,7 +510,7 @@ Exports are standard JSON, safe to:
 
 ### Nodes Not Discovering Each Other
 
-**Problem:** Started TAZCOM but no peers appear.
+**Problem:** Started TAD but no peers appear.
 
 **Solutions:**
 
@@ -519,20 +519,20 @@ Exports are standard JSON, safe to:
    - Try `ping <other-ip>` to verify connectivity
 
 2. **Check Firewall:**
-   - Allow Python/TAZCOM through firewall
+   - Allow Python/TAD through firewall
    - Open UDP port 5353 (mDNS)
    - Open TCP ports 50000-60000 (dynamic ports)
 
 3. **Check mDNS Service:**
    ```bash
    # macOS/Linux
-   dns-sd -B _tazcom._tcp
+   dns-sd -B _tad._tcp
    
-   # Should show TAZCOM nodes
+   # Should show TAD nodes
    ```
 
 4. **Restart Nodes:**
-   - Exit TAZCOM (Ctrl+C)
+   - Exit TAD (Ctrl+C)
    - Wait 5 seconds
    - Restart: `python -m tad.main`
 
@@ -658,7 +658,7 @@ cp tad_node.db tad_node.db.backup
 
 ### Custom Port Configuration
 
-By default, TAZCOM uses random available ports. To specify:
+By default, TAD uses random available ports. To specify:
 
 ```python
 # In tad/node.py, modify __init__
@@ -674,9 +674,9 @@ self.tcp_port = 5000  # Fixed port
 **systemd (Linux):**
 
 ```ini
-# /etc/systemd/system/tazcom.service
+# /etc/systemd/system/tad.service
 [Unit]
-Description=TAZCOM P2P Chat
+Description=TAD P2P Chat
 After=network.target
 
 [Service]
@@ -691,8 +691,8 @@ WantedBy=multi-user.target
 ```
 
 ```bash
-sudo systemctl enable tazcom
-sudo systemctl start tazcom
+sudo systemctl enable tad
+sudo systemctl start tad
 ```
 
 ---
@@ -701,7 +701,7 @@ sudo systemctl start tazcom
 
 **Check Discovery:**
 ```bash
-dns-sd -B _tazcom._tcp
+dns-sd -B _tad._tcp
 ```
 
 **Check Connections:**
@@ -719,7 +719,7 @@ tcpdump -i en0 port 5353  # mDNS
 ## FAQ
 
 **Q: Do I need internet access?**
-A: No! TAZCOM works on local networks without internet.
+A: No! TAD works on local networks without internet.
 
 **Q: Can I use this over the internet?**
 A: Not directly. You'd need VPN or port forwarding (not recommended without additional security).
