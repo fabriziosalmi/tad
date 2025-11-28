@@ -6,8 +6,6 @@ export default defineConfig({
   
   base: '/tad/',
   
-  ignoreDeadLinks: true,
-  
   head: [
     ['link', { rel: 'icon', href: '/tad/favicon.ico' }],
     ['meta', { name: 'theme-color', content: '#3eaf7c' }],
