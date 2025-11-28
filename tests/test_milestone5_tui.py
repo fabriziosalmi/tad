@@ -198,7 +198,7 @@ class TestChannelCommands:
 
         app._cmd_join(["#new"])
 
-        app.channel_list.add_channel.assert_called_with("#new")
+        app.channel_list.add_channel.assert_called_with("#new", "public")
 
     def test_leave_removes_from_state(self, app_with_mocks):
         """Test /leave removes channel from state."""
