@@ -748,7 +748,7 @@ cd ~/tad2 && python -m tad.main &
 ## Getting Help
 
 - **GitHub Issues:** https://github.com/yourusername/tad/issues
-- **Documentation:** See `README.md`, `FASE_1_COMPLETE.md`
+- **Documentation:** See `README.md`, `architecture documentation`
 - **Logs:** Check terminal output, enable DEBUG level
 - **Community:** (Future: Discord/Matrix)
 
@@ -762,4 +762,4 @@ MIT License - See LICENSE file
 
 **Happy Chatting! 🎉**
 
-*For developers: See FASE_1_COMPLETE.md for technical architecture*
+*For developers: See architecture documentation for technical architecture*
