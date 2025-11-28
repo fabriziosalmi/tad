@@ -1,0 +1,74 @@
+[Unit]
+Description=TAZCOM P2P Chat Service
+Documentation=https://github.com/yourusername/tad
+After=network.target network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=%i
+Group=%i
+
+# Working directory (adjust to your installation path)
+WorkingDirectory=/opt/tazcom
+
+# Start command (adjust path to your venv)
+ExecStart=/opt/tazcom/venv/bin/python -m tad.main
+
+# Restart policy
+Restart=on-failure
+RestartSec=10
+StartLimitBurst=5
+StartLimitIntervalSec=300
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=tazcom
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/opt/tazcom
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+
+# Resource limits (optional)
+# LimitNOFILE=65536
+# MemoryMax=512M
+# CPUQuota=50%
+
+[Install]
+WantedBy=multi-user.target
+
+# Installation instructions:
+#
+# 1. Copy this file:
+#    sudo cp tazcom.service /etc/systemd/system/
+#
+# 2. Edit paths in WorkingDirectory and ExecStart if needed:
+#    sudo nano /etc/systemd/system/tazcom.service
+#
+# 3. Reload systemd:
+#    sudo systemctl daemon-reload
+#
+# 4. Enable on boot:
+#    sudo systemctl enable tazcom
+#
+# 5. Start service:
+#    sudo systemctl start tazcom
+#
+# 6. Check status:
+#    sudo systemctl status tazcom
+#
+# 7. View logs:
+#    sudo journalctl -u tazcom -f
+#
+# 8. Stop service:
+#    sudo systemctl stop tazcom
+#
+# 9. Restart service:
+#    sudo systemctl restart tazcom

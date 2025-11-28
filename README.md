@@ -20,22 +20,47 @@
 
 ---
 
-## Quick Start (30 secondi)
+## 📚 Documentation
+
+- **[USER_GUIDE.md](USER_GUIDE.md)** - Complete user manual with all commands and examples
+- **[DEPLOYMENT.md](DEPLOYMENT.md)** - Installation, systemd service, Docker, Raspberry Pi
+- **[FASE_1_COMPLETE.md](FASE_1_COMPLETE.md)** - Technical architecture documentation
+- **[START_HERE.md](START_HERE.md)** - Project overview and quick start
+
+---
+
+## Quick Install
 
 ```bash
-# 1. Installa dipendenze
-pip install -r requirements.txt
+# Automatic installation (recommended)
+./install.sh
 
-# 2. Avvia il nodo
+# Manual installation
+pip install -r requirements.txt
 python -m tad.main
 
-# 3. Usa i comandi della TUI:
-/help                           # Lista comandi
-/create #myChannel private      # Crea canale privato
-/invite <node_id> #myChannel    # Invita qualcuno
+# Uninstall
+./uninstall.sh
 ```
 
-I nodi si scoprono automaticamente - nessuna configurazione richiesta!
+See [DEPLOYMENT.md](DEPLOYMENT.md) for systemd service, Docker, and advanced setups.
+
+---
+
+## Quick Start (30 seconds)
+
+```bash
+# 1. Start TAZCOM
+./tazcom  # or: python -m tad.main
+
+# 2. Use TUI commands:
+/help                           # List commands
+/create #myChannel private      # Create private channel
+/invite <node_id> #myChannel    # Invite someone
+/export                         # Backup messages
+```
+
+Nodes auto-discover each other - zero configuration required!
 
 ---
 
