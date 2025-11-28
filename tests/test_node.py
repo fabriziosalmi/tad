@@ -8,7 +8,7 @@ We mock Zeroconf, TCP streams, and other external dependencies.
 import asyncio
 import json
 from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, Mock, patch
 
 import pytest
 
@@ -82,14 +82,14 @@ class TestPeerManagement:
         """Test that peer discovery correctly adds peer to list."""
         node = initialized_node
 
-        # Mock the Zeroconf instance and get_service_info
-        with patch.object(node.aiozc, "zeroconf", create=True) as mock_zeroconf:
-            mock_zeroconf.get_service_info.return_value = mock_zeroconf_service_info
+        # Mock the Zeroconf service discovery
+        mock_zeroconf = MagicMock()
+        mock_zeroconf.get_service_info.return_value = mock_zeroconf_service_info
 
-            # Call the service added handler
-            await node._on_service_added(
-                mock_zeroconf, "_tazcom._tcp.local.", "TAZCOM Node x9y8z7w6._tazcom._tcp.local."
-            )
+        # Call the service added handler
+        await node._on_service_added(
+            mock_zeroconf, "_tazcom._tcp.local.", "TAZCOM Node x9y8z7w6._tazcom._tcp.local."
+        )
 
         # Verify peer was added
         peer_id = "x9y8z7w6v5u4t3s2..."
@@ -116,10 +116,10 @@ class TestPeerManagement:
         mock_info.addresses = [127 << 24 | 2]
         mock_info.port = 54322
 
-        with patch.object(node.aiozc, "zeroconf", create=True) as mock_zeroconf:
-            mock_zeroconf.get_service_info.return_value = mock_info
+        mock_zeroconf = MagicMock()
+        mock_zeroconf.get_service_info.return_value = mock_info
 
-            await node._on_service_added(mock_zeroconf, "_tazcom._tcp.local.", "test")
+        await node._on_service_added(mock_zeroconf, "_tazcom._tcp.local.", "test")
 
         # Peer should NOT be added (we ignore our own service)
         assert "a1b2c3d4e5f6g7h8..." not in node.peers

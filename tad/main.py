@@ -10,7 +10,10 @@ Modern, multi-channel interface with:
 """
 
 import asyncio
+import json
 import logging
+from datetime import datetime
+from pathlib import Path
 from typing import Optional
 
 from textual.app import ComposeResult, on
@@ -234,6 +237,10 @@ class TADTUIApp(Screen):
             self._cmd_create(args)
         elif command == "invite":
             self._cmd_invite(args)
+        elif command == "export":
+            self._cmd_export(args)
+        elif command == "import":
+            self._cmd_import(args)
         else:
             self.message_view.add_command_output(f"Unknown command: /{command}")
 
@@ -391,6 +398,8 @@ class TADTUIApp(Screen):
   /s <#channel>         - Shortcut for /switch
   /channels             - List all subscribed channels
   /peers                - Show connected peers
+  /export [#ch] [file]  - Export messages to JSON (default: all channels)
+  /import <file>        - Import messages from JSON
   /help                 - Show this help message
 
 Keyboard Shortcuts:
@@ -402,6 +411,102 @@ Keyboard Shortcuts:
 Multi-channel messaging: Type normally to send a message to the active channel."""
 
         self.message_view.add_command_output(help_text)
+
+    def _cmd_export(self, args: list) -> None:
+        """
+        Handle /export command.
+
+        Usage: /export [channel_id] [filename]
+        Example: /export #general messages.json
+                 /export (exports all channels to tad_export_TIMESTAMP.json)
+        """
+        channel_id = args[0] if len(args) > 0 and args[0].startswith("#") else None
+        filename = args[1] if len(args) > 1 else args[0] if len(args) > 0 and not args[0].startswith("#") else None
+
+        # Generate default filename if not provided
+        if not filename:
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            channel_suffix = channel_id.replace("#", "") if channel_id else "all"
+            filename = f"tad_export_{channel_suffix}_{timestamp}.json"
+
+        try:
+            # Export messages from database
+            messages = self.node.db_manager.export_messages_to_json(channel_id)
+
+            if not messages:
+                self.message_view.add_system_message(
+                    f"No messages to export from {channel_id or 'any channel'}"
+                )
+                return
+
+            # Write to file
+            export_data = {
+                "export_date": datetime.now().isoformat(),
+                "channel": channel_id or "all",
+                "message_count": len(messages),
+                "messages": messages,
+            }
+
+            filepath = Path(filename)
+            with open(filepath, "w", encoding="utf-8") as f:
+                json.dump(export_data, f, indent=2, ensure_ascii=False)
+
+            self.message_view.add_system_message(
+                f"✓ Exported {len(messages)} messages to {filepath.absolute()}"
+            )
+            logger.info(f"Exported {len(messages)} messages to {filepath}")
+
+        except Exception as e:
+            self.message_view.add_system_message(f"✗ Export failed: {e}")
+            logger.error(f"Export error: {e}")
+
+    def _cmd_import(self, args: list) -> None:
+        """
+        Handle /import command.
+
+        Usage: /import <filename>
+        Example: /import messages.json
+        """
+        if not args:
+            self.message_view.add_command_output("Usage: /import <filename>")
+            return
+
+        filename = args[0]
+        filepath = Path(filename)
+
+        if not filepath.exists():
+            self.message_view.add_system_message(f"✗ File not found: {filepath}")
+            return
+
+        try:
+            # Read file
+            with open(filepath, "r", encoding="utf-8") as f:
+                import_data = json.load(f)
+
+            messages = import_data.get("messages", [])
+
+            if not messages:
+                self.message_view.add_system_message("✗ No messages found in file")
+                return
+
+            # Import messages to database
+            imported_count = self.node.db_manager.import_messages_from_json(messages)
+
+            self.message_view.add_system_message(
+                f"✓ Imported {imported_count}/{len(messages)} messages from {filepath.name}"
+            )
+            logger.info(f"Imported {imported_count}/{len(messages)} messages")
+
+            # Reload current channel history to show imported messages
+            if self.ui_state.active_channel:
+                self.app.call_later(self._load_channel_history, self.ui_state.active_channel)
+
+        except json.JSONDecodeError as e:
+            self.message_view.add_system_message(f"✗ Invalid JSON file: {e}")
+            logger.error(f"JSON decode error: {e}")
+        except Exception as e:
+            self.message_view.add_system_message(f"✗ Import failed: {e}")
+            logger.error(f"Import error: {e}")
 
     def action_quit(self) -> None:
         """Quit the application."""

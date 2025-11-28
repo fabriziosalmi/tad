@@ -712,3 +712,116 @@ class DatabaseManager:
                 logger.warning(f"Could not get per-channel stats: {e}")
 
         return stats
+
+    def export_messages_to_json(self, channel_id: Optional[str] = None) -> List[Dict]:
+        """
+        Export messages to JSON format for backup/export.
+
+        Args:
+            channel_id: If specified, export only messages from this channel.
+                        If None, export all messages.
+
+        Returns:
+            List of message dictionaries ready for JSON serialization
+        """
+        if not self.connection:
+            return []
+
+        try:
+            cursor = self.connection.cursor()
+
+            if channel_id:
+                cursor.execute(
+                    """
+                    SELECT msg_id, channel_id, sender_id, content,
+                           timestamp, signature, is_encrypted, nonce
+                    FROM messages
+                    WHERE channel_id = ?
+                    ORDER BY timestamp ASC
+                    """,
+                    (channel_id,),
+                )
+            else:
+                cursor.execute(
+                    """
+                    SELECT msg_id, channel_id, sender_id, content,
+                           timestamp, signature, is_encrypted, nonce
+                    FROM messages
+                    ORDER BY timestamp ASC, channel_id ASC
+                    """
+                )
+
+            rows = cursor.fetchall()
+            messages = []
+
+            for row in rows:
+                msg_dict = dict(row)
+                # Convert SQLite Row to plain dict
+                messages.append({
+                    "msg_id": msg_dict["msg_id"],
+                    "channel_id": msg_dict["channel_id"],
+                    "sender_id": msg_dict["sender_id"],
+                    "content": msg_dict["content"],
+                    "timestamp": msg_dict["timestamp"],
+                    "signature": msg_dict["signature"],
+                    "is_encrypted": bool(msg_dict["is_encrypted"]),
+                    "nonce": msg_dict["nonce"],
+                })
+
+            logger.info(f"Exported {len(messages)} messages from {channel_id or 'all channels'}")
+            return messages
+
+        except sqlite3.Error as e:
+            logger.error(f"Error exporting messages: {e}")
+            return []
+
+    def import_messages_from_json(self, messages: List[Dict]) -> int:
+        """
+        Import messages from JSON format (from backup/import).
+
+        Args:
+            messages: List of message dictionaries (from export_messages_to_json)
+
+        Returns:
+            Number of messages successfully imported
+        """
+        if not self.connection:
+            return 0
+
+        imported_count = 0
+
+        for msg in messages:
+            try:
+                # Ensure channel exists (create if needed)
+                channel_id = msg.get("channel_id")
+                if channel_id and not self.get_channel_info(channel_id):
+                    self.store_channel(
+                        channel_id,
+                        name=channel_id,
+                        channel_type="public",  # Default to public for imports
+                    )
+
+                # Store the message (using existing store_message logic)
+                # Create a message envelope compatible with store_message
+                message_envelope = {
+                    "msg_id": msg.get("msg_id"),
+                    "payload": {
+                        "content": msg.get("content"),
+                        "channel_id": channel_id,
+                        "timestamp": msg.get("timestamp"),
+                        "is_encrypted": msg.get("is_encrypted", False),
+                        "nonce": msg.get("nonce"),
+                    },
+                    "sender_id": msg.get("sender_id"),
+                    "signature": msg.get("signature"),
+                }
+
+                self.store_message(message_envelope)
+                imported_count += 1
+
+            except Exception as e:
+                logger.warning(f"Failed to import message {msg.get('msg_id')}: {e}")
+                continue
+
+        logger.info(f"Imported {imported_count}/{len(messages)} messages")
+        return imported_count

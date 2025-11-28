@@ -7,7 +7,7 @@ to verify the complete message flow and peer discovery.
 
 import asyncio
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
@@ -312,9 +312,9 @@ class TestCleanup:
         """Test that app properly cleans up on shutdown."""
         app = TAZCOMChatApp()
 
-        # Mock the node
+        # Mock the node with AsyncMock for async methods
         app.node = MagicMock()
-        app.node.shutdown = MagicMock()
+        app.node.shutdown = AsyncMock()
 
         # Simulate shutdown (what action_quit would do)
         if app.node:
