@@ -1,6 +1,4 @@
-# TAD: Tactical Autonomous Decentralized
-
-**[ Status: Production-Ready MVP ✅ ]**
+# TAD: Tactical Autonomous Devices
 
 [![Documentation](https://img.shields.io/badge/docs-VitePress-blue)](https://fabriziosalmi.github.io/tad/)
 [![Tests](https://img.shields.io/badge/tests-97%20passing-success)](tests/)
@@ -11,9 +9,7 @@
 
 ---
 
-## 🎉 Production-Ready MVP
-
-**TAD** is a **production-ready** P2P decentralized chat system with:
+**TAD** is a P2P decentralized chat system with:
 
 - ✅ **Zero Configuration** - Auto-discovery via mDNS
 - ✅ **Multi-Channel Chat** - Professional terminal interface  
@@ -126,26 +122,17 @@ TAD is a **peer-to-peer, decentralized chat system** designed for offline-first 
 
 ---
 
-## ✅ Current Features
-
-- [x] mDNS peer discovery
-- [x] Direct TCP connections
-- [x] Gossip protocol routing
-- [x] Multi-channel chat
-- [x] Private encrypted channels
-- [x] Message persistence (SQLite)
-- [x] Advanced TUI interface
-- [x] Export/import functionality
-- [x] Message signing (Ed25519)
-- [x] 97 passing tests
-
-## 🔮 Planned Features
-
-- [ ] Message search (\`/search\` command)
-- [ ] Emoji reactions
-- [ ] File sharing
-- [ ] Voice messages
-- [ ] Mobile apps (iOS/Android)
+## Current Features
+- mDNS peer discovery
+- Direct TCP connections
+- Gossip protocol routing
+- Multi-channel chat
+- Private encrypted channels
+- Message persistence (SQLite)
+- Advanced TUI interface
+- Export/import functionality
+- Message signing (Ed25519)
+- 97 passing tests
 
 ---
 
