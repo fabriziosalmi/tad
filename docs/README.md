@@ -1,6 +1,6 @@
 # TAD Documentation
 
-This directory contains the VitePress documentation for TAD.
+This directory contains the documentation for TAD.
 
 ## Local Development
 
