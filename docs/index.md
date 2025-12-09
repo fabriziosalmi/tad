@@ -3,7 +3,7 @@ layout: home
 
 hero:
   name: TAD
-  text: Tactical Autonomous Devices
+  text: Temporary Autonomous Devices
   tagline: P2P decentralized chat for offline-first communities
   image:
     src: /logo.svg
@@ -62,10 +62,10 @@ Nodes on the same network will auto-discover each other!
 
 TAD is a **peer-to-peer, decentralized chat system** designed for offline-first communication in environments where traditional infrastructure fails or is absent:
 
-- 🎉 **Free parties** - Coordinate without cell service
-- 🏕️ **TAZ (Temporary Autonomous Zones)** - Community self-organization
-- 📢 **Protests & demonstrations** - Resilient communication
-- 🌄 **Remote locations** - Chat on local networks
+- **Free parties** - Coordinate without cell service
+- **TAZ (Temporary Autonomous Zones)** - Community self-organization
+- **Protests & demonstrations** - Resilient communication
+- **Remote locations** - Chat on local networks
 
 ### Core Principles
 
