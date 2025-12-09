@@ -3,7 +3,7 @@ layout: home
 
 hero:
   name: TAD
-  text: Tactical Autonomous Zone Communications
+  text: Tactical Autonomous Devices
   tagline: P2P decentralized chat for offline-first communities
   image:
     src: /logo.svg
@@ -38,7 +38,7 @@ features:
     details: Professional terminal interface with multi-channel support and keyboard shortcuts.
   
   - icon: ✅
-    title: Production Ready
+    title: TAZ Ready
     details: 97 tests passing, 100% coverage. Battle-tested with comprehensive documentation.
 ---
 
@@ -89,8 +89,6 @@ TAD is a **peer-to-peer, decentralized chat system** designed for offline-first 
 
 ## Feature Status
 
-**v1.0 - MVP** ✅ **COMPLETE**
-
 - [x] mDNS peer discovery
 - [x] Direct TCP connections  
 - [x] Gossip protocol routing
@@ -99,15 +97,6 @@ TAD is a **peer-to-peer, decentralized chat system** designed for offline-first 
 - [x] Message persistence (SQLite)
 - [x] Advanced TUI interface
 - [x] Export/import functionality
-- [x] 97 passing tests (100% coverage)
-
-**Future - Future** 🔮
-
-- [ ] Message search (/search command)
-- [ ] Emoji reactions
-- [ ] File sharing
-- [ ] Voice messages
-- [ ] Mobile apps
 
 ## Documentation
 
@@ -130,6 +119,3 @@ TAD is a **peer-to-peer, decentralized chat system** designed for offline-first 
 - **Issues**: [Report bugs or request features](https://github.com/fabriziosalmi/tad/issues)
 - **License**: MIT
 
----
-
-*"The network is not something you use. The network is where you are. The network is us."*
