@@ -1,4 +1,4 @@
-# TAD: Tactical Autonomous Devices
+# TAD: Temporary Autonomous Devices
 
 [![Documentation](https://img.shields.io/badge/docs-VitePress-blue)](https://fabriziosalmi.github.io/tad/)
 [![Tests](https://img.shields.io/badge/tests-97%20passing-success)](tests/)
