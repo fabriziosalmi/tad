@@ -92,13 +92,38 @@ python -m tad.main
 ## 🏗️ Architecture
 
 \`\`\`
-┌─────────────┐     mDNS      ┌─────────────┐    Gossip     ┌─────────────┐
-│   Node A    │◄────────────► │   Node B    │◄─────────────►│   Node C    │
-│             │   Discovery   │             │   Protocol    │             │
-│  • Ed25519  │               │  • X25519   │               │  • SQLite   │
-│  • SQLite   │     TCP       │  • AES-GCM  │     TCP       │  • Textual  │
-│  • Textual  │◄────────────► │  • Gossip   │◄─────────────►│  • Gossip   │
-└─────────────┘   Messages    └─────────────┘   Messages    └─────────────┘
+```mermaid
+graph LR
+    subgraph NodeA [Node A]
+        direction TB
+        A1[Ed25519]
+        A2[SQLite]
+        A3[Textual]
+    end
+
+    subgraph NodeB [Node B]
+        direction TB
+        B1[X25519]
+        B2[AES-GCM]
+        B3[Gossip]
+    end
+
+    subgraph NodeC [Node C]
+        direction TB
+        C1[SQLite]
+        C2[Textual]
+        C3[Gossip]
+    end
+
+    NodeA <==>|mDNS Discovery| NodeB
+    NodeB <==>|Gossip Protocol| NodeC
+    
+    NodeA <-->|TCP Messages| NodeB
+    NodeB <-->|TCP Messages| NodeC
+
+    classDef node fill:#2d3748,stroke:#4a5568,color:#fff
+    class NodeA,NodeB,NodeC node
+```
 \`\`\`
 
 **Technologies:**
