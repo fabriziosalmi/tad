@@ -9,14 +9,21 @@
 
 ---
 
-**TAD** is a P2P decentralized chat system with:
+TAD is a **peer-to-peer, decentralized chat system** designed for offline-first communication in environments where traditional infrastructure fails or is absent:
 
-- ✅ **Zero Configuration** - Auto-discovery via mDNS
-- ✅ **Multi-Channel Chat** - Professional terminal interface  
-- ✅ **End-to-End Encryption** - AES-256-GCM private channels
-- ✅ **Message Persistence** - SQLite database with export/import
-- ✅ **Digital Identity** - Ed25519 cryptographic signatures
-- ✅ **100% Test Coverage** - 97/97 tests passing
+- **Free Parties** - Coordinate without cell service
+- **TAZ (Temporary Autonomous Zones)** - Community self-organization
+- **Protests & Demonstrations** - Resilient communication
+- **Remote Locations** - Chat on local networks
+
+### Core Principles
+
+1. **No Central Authority** - True P2P mesh networking
+2. **Offline-First** - Works on local networks, no internet required
+3. **Privacy by Design** - E2EE for private channels
+4. **Resilience** - Gossip protocol ensures message delivery
+5. **Simplicity** - Zero configuration, just works
+
 
 ---
 
@@ -38,7 +45,7 @@ Or browse local docs:
 
 ## ⚡ Quick Install
 
-\`\`\`bash
+```bash
 # Automatic installation (recommended)
 git clone https://github.com/fabriziosalmi/tad.git
 cd tad
@@ -46,24 +53,26 @@ cd tad
 
 # Start TAD
 ./tad
-\`\`\`
+```
 
-**Manual installation:**
-\`\`\`bash
+### Manual installation
+
+```bash
 pip install -r requirements.txt
 python -m tad.main
-\`\`\`
+```
 
-**Uninstall:**
-\`\`\`bash
+### Uninstall
+
+```bash
 ./uninstall.sh
-\`\`\`
+```
 
 ---
 
 ## 🚀 Quick Start
 
-\`\`\`bash
+```bash
 # Start TAD
 ./tad
 
@@ -73,28 +82,10 @@ python -m tad.main
 /invite <node_id> #myChannel    # Invite peer to channel
 /export                         # Backup messages
 /peers                          # Show connected peers
-\`\`\`
+```
 
 **Zero configuration needed!** Nodes auto-discover on the same network.
 
----
-
-## 🌟 What is TAD?
-
-TAD is a **peer-to-peer, decentralized chat system** designed for offline-first communication in environments where traditional infrastructure fails or is absent:
-
-- 🎉 **Free Parties** - Coordinate without cell service
-- 🏕️ **TAZ (Temporary Autonomous Zones)** - Community self-organization
-- 📢 **Protests & Demonstrations** - Resilient communication
-- 🌄 **Remote Locations** - Chat on local networks
-
-### Core Principles
-
-1. **No Central Authority** - True P2P mesh networking
-2. **Offline-First** - Works on local networks, no internet required
-3. **Privacy by Design** - E2EE for private channels
-4. **Resilience** - Gossip protocol ensures message delivery
-5. **Simplicity** - Zero configuration, just works
 
 ---
 

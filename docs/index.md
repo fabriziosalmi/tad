@@ -100,18 +100,14 @@ TAD is a **peer-to-peer, decentralized chat system** designed for offline-first 
 
 ## Documentation
 
-<div class="vp-doc">
-  <div class="custom-block tip">
-    <p class="custom-block-title">📚 Complete Documentation</p>
-    <ul>
-      <li><a href="/guide/getting-started">Getting Started</a> - Install and run TAD</li>
-      <li><a href="/guide/user-guide">User Guide</a> - All commands and features</li>
-      <li><a href="/guide/deployment">Deployment</a> - systemd, Docker, Raspberry Pi</li>
-      <li><a href="/reference/architecture">Architecture</a> - Technical deep dive</li>
-      <li><a href="/reference/api">API Reference</a> - Python modules and classes</li>
-    </ul>
-  </div>
-</div>
+::: tip 📚 Complete Documentation
+- [Getting Started](/guide/getting-started.md) - Install and run TAD
+- [User Guide](/guide/user-guide.md) - All commands and features
+- [Deployment](/guide/deployment.md) - systemd, Docker, Raspberry Pi
+- [Architecture](/reference/architecture.md) - Technical deep dive
+- [API Reference](/reference/api-node.md) - Python modules and classes
+:::
+
 
 ## Community
 

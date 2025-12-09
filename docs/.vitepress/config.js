@@ -3,9 +3,9 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: 'TAD',
   description: 'Tactical Autonomous Zone Communications - P2P Decentralized Chat',
-  
+
   base: '/tad/',
-  
+
   head: [
     ['link', { rel: 'icon', href: '/tad/favicon.ico' }],
     ['meta', { name: 'theme-color', content: '#3eaf7c' }],
@@ -15,7 +15,7 @@ export default defineConfig({
 
   themeConfig: {
     logo: '/logo.svg',
-    
+
     nav: [
       { text: 'Guide', link: '/guide/getting-started' },
       { text: 'Reference', link: '/reference/architecture' },
@@ -97,7 +97,7 @@ export default defineConfig({
 
     footer: {
       message: 'Released under the MIT License.',
-      copyright: 'Copyright © 2024-2025 TAD Contributors'
+      copyright: 'Copyright Fabrizio Salmi 2025'
     },
 
     search: {
